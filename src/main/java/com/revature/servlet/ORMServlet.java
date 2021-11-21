@@ -10,8 +10,8 @@ import java.io.IOException;
 @WebServlet(urlPatterns = "/ORM")
 public class ORMServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp){
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.getOutputStream().println("Welcome to Home Page");
     }
 
     @Override

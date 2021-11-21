@@ -19,6 +19,17 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.revature</groupId>
+            <artifactId>IsaiahAnasonORM_p1</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 
 </project>
