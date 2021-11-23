@@ -1,6 +1,7 @@
 package com.revature.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.models.Dog;
 import com.revature.services.ORM;
 import com.revature.services.ServletHelper;
 
@@ -10,13 +11,36 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet("/dog")
 public class DogServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        Class<?> objectClassType = ServletHelper.getClass(req.getHeader("Object-Type"));
+        String requestType = req.getHeader("Request-Type");
+        ObjectMapper mapper = new ObjectMapper();
+
+        if(objectClassType.getSimpleName().equals("Dog")){
+            if(requestType.equals("single record")){
+                Object obj = ORM.readRecordByID(objectClassType, req.getHeader("Primary-Key"));
+                resp.getWriter().println(mapper.writeValueAsString(obj));
+                resp.setStatus(200);
+            }
+            else if (requestType.equals("all")){
+                List<Object> objects = ORM.readAll(objectClassType);
+                for(Object obj: objects){
+                    resp.getWriter().println(mapper.writeValueAsString(obj));
+                }
+                resp.setStatus(200);
+            }
+            else{
+                resp.getOutputStream().println("<h2>Failed to find Objects</h2>");
+                resp.setStatus(403);
+            }
+        }
+
     }
 
     @Override
@@ -29,7 +53,7 @@ public class DogServlet extends HttpServlet {
         boolean recordUpdated = false;
         Object obj = null;
 
-        if (contentType.equals("application/json")) {
+        if (contentType.equals("application/json")&&objectClassType.getSimpleName().equals("Dog")) {
             try {
                 obj = mapper.readValue(collectorBody, objectClassType);
                 if (ORM.updateRecord(obj))
@@ -39,11 +63,11 @@ public class DogServlet extends HttpServlet {
             }
         }
         if (recordUpdated) {
-            resp.setStatus(201);
+            resp.setStatus(200);
             resp.setHeader("Content-Type", "application/json");
             resp.getWriter().println(mapper.writeValueAsString(obj));
         } else {
-            resp.setStatus(200);
+            resp.setStatus(403);
             resp.getOutputStream().println("<h2>Invalid Object to update</h2>");
         }
     }
@@ -58,7 +82,7 @@ public class DogServlet extends HttpServlet {
         boolean recordAdded = false;
         Object obj = null;
 
-        if (contentType.equals("application/json")) {
+        if (contentType.equals("application/json")&&objectClassType.getSimpleName().equals("Dog")) {
             try {
                 obj = mapper.readValue(collectorBody, objectClassType);
                 if (ORM.addRecord(obj))
@@ -79,6 +103,21 @@ public class DogServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String primaryKeyToDelete = req.getParameter("Primary-Key");
+        String primaryKeyToDelete = req.getHeader("Primary-Key");
+        Class<?> objectClassType = ServletHelper.getClass(req.getHeader("Object-Type"));
+        if(req.getHeader("Object-Type").equals("Dog")){
+            if(ORM.deleteRecordPrimaryKey(objectClassType, primaryKeyToDelete)){
+                resp.getOutputStream().println("Deleted Successfully");
+                resp.setStatus(200);
+            }
+            else{
+                resp.getOutputStream().println("Failed to delete");
+                resp.setStatus(400);
+            }
+        }
+        else{
+            resp.getOutputStream().println("Failed to delete");
+            resp.setStatus(400);
+        }
     }
 }
