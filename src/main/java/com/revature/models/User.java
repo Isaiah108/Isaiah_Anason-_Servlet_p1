@@ -16,7 +16,7 @@ public class User {
     @Column
     private double netWorth;
     @Unique
-    private int SSN;
+    private int ssn;
 
     public String getUsername() {
         return username;
@@ -67,10 +67,10 @@ public class User {
     }
 
     public int getSSN() {
-        return SSN;
+        return ssn;
     }
 
     public void setSSN(int SSN) {
-        this.SSN = SSN;
+        this.ssn= SSN;
     }
 }
