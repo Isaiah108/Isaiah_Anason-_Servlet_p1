@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ServletHelper {
-
     public static void readingObjects(HttpServletRequest req, HttpServletResponse resp, Class<?> classType) throws IOException {
         String requestType = req.getParameter("Request-Type");
         ObjectMapper mapper = new ObjectMapper();
+        if(requestType==null)return;
 
         if (requestType.equals("single")) {
             Object obj = ORM.readRecordByID(classType, req.getParameter("Primary-Key"));
